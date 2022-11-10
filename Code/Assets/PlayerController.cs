@@ -4,15 +4,17 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public Grounded GroundCollider;
+    public Transform GroundCheck;
+    public LayerMask GroundLayers;
 
-    public float WalkSpeed = 20f;
-    public float RunSpeed = 20f;
+    public float WalkSpeed = 10f;
+    public float RunSpeed = 15f;
 
     public float JumpHeight = 2f;
     public float JumpTimeSeconds = 2f;
 
     private Rigidbody2D rig;
+    private Vector2 velocity = Vector2.zero;
 
     // Start is called before the first frame update
     void Start()
@@ -23,44 +25,48 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Move(Input.GetAxis("Horizontal"));
+
         //bool grounded = GroundCollider.
         ////Debug.Log(grounded);
         //
-        var deltaX = Input.GetAxis("Horizontal");
-        var deltaY = -9.81f;
-        if(Input.GetKeyUp(KeyCode.Space) && GroundCollider.IsColliding)
-        {
-            // Jump
-            rig.velocity += new Vector2(0, 10);
-            Debug.Log($"You Jumped {deltaY}");
-        }
-
-        rig.velocity = new Vector2(deltaX * WalkSpeed, rig.velocity.y + deltaY * Time.deltaTime);
+        //var deltaX = Input.GetAxis("Horizontal");
+        //var deltaY = -9.81f;
+        //if(Input.GetKeyUp(KeyCode.Space) && GroundCollider.IsColliding)
+        //{
+        //    // Jump
+        //    rig.velocity += new Vector2(0, 10);
+        //    Debug.Log($"You Jumped {deltaY}");
+        //}
+        //
+        //rig.velocity = new Vector2(deltaX * WalkSpeed, rig.velocity.y + deltaY * Time.deltaTime);
     }
 
-    //void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    RemoveOverlap(collision);
-    //}
-    //
-    //void OnCollisionStay2D(Collision2D collision)
-    //{
-    //    RemoveOverlap(collision);
-    //}
-    //
-    //void RemoveOverlap(Collision2D collision)
-    //{
-    //    Debug.Log("I collided");
-    //    // If we're filtering out the collider we hit then ignore it.
-    //    //if (m_MovementFilter.IsFilteringLayerMask(collision.collider.gameObject))
-    //    //    return;
-    //
-    //    // Calculate the collider distance.
-    //    var colliderDistance = Physics2D.Distance(collision.otherCollider, collision.collider);
-    //
-    //    // If we're overlapped then remove the overlap.
-    //    // NOTE: We could also ensure we move out of overlap by the contact offset here.
-    //    if (colliderDistance.isOverlapped)
-    //        collision.otherRigidbody.position += colliderDistance.normal * colliderDistance.distance;
-    //}
+    private void Move(float moveDir)
+    {
+        bool isGrounded = false;
+        foreach(var collider in Physics2D.OverlapCircleAll(GroundCheck.position, 0.5f, GroundLayers))
+        {
+            if (collider.gameObject != gameObject)
+            {
+                isGrounded = true;
+                break;
+            }
+        }
+        if(!isGrounded)
+        {
+            return;
+        }
+
+        Vector2 targetVelocity = new Vector2(WalkSpeed * moveDir, rig.velocity.y);
+        // Smoothing
+        targetVelocity = Vector2.SmoothDamp(rig.velocity, targetVelocity, ref velocity, 0.05f);
+        rig.velocity = targetVelocity;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            float jumpForce = Mathf.Sqrt(-2.0f * Physics2D.gravity.y * rig.gravityScale * JumpHeight);
+            rig.velocity += new Vector2(0f, jumpForce);
+        }
+    }
 }
