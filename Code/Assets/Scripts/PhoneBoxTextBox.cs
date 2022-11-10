@@ -5,16 +5,17 @@ using UnityEngine.UI;
 
 public class PhoneBoxTextBox : MonoBehaviour
 {
-    public Text phonebox;
 
-    public void PhoneBoxUI()
-    {
-        phonebox.text = "Hey";
-    }
+    public Text mainText;
+    public Button continueButton;
 
     void Start()
     {
-        
+
     }
 
+    void Update()
+    {
+        
+    }
 }
