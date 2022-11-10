@@ -56,10 +56,10 @@ Material:
     - _TopOrigin: -0.06
     - _TopSpread: 0.39
     m_Colors:
-    - _BottomColor: {r: 0.4716981, g: 0.4407477, b: 0.18022428, a: 0}
+    - _BottomColor: {r: 0.8490566, g: 0.8217794, b: 0.59674263, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
-    - _MiddleColor: {r: 0.5283019, g: 0.35249063, b: 0.26165894, a: 0}
+    - _MiddleColor: {r: 0.6320754, g: 0.3814989, b: 0.25342646, a: 0}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
-    - _TopColor: {r: 0.735849, g: 0.6062687, b: 0.31585974, a: 0}
+    - _TopColor: {r: 0.6981132, g: 0.5235849, b: 0.65734446, a: 0}
   m_BuildTextureStacks: []
