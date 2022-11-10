@@ -8,6 +8,11 @@ public class Checkpoint : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        RespawnManager.Instance.ActivateCheckpoint(this);
+        // Ugly workaround to prevent triggering the method twice (for two colliders)
+        if(RespawnManager.Instance.CurrentCheckpoint.ID != ID && collision.gameObject.tag == "Player")
+        {
+            RespawnManager.Instance.ActivateCheckpoint(this);
+        }
+        
     }
 }
