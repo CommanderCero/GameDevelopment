@@ -170,7 +170,7 @@ MonoBehaviour:
     m_Bits: 2147483647
   WalkSpeed: 10
   RunSpeed: 15
-  JumpHeight: 2
+  JumpHeight: 6
   JumpTimeSeconds: 2
 --- !u!1 &8696489166859348523
 GameObject:
