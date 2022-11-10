@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rig = GetComponent<Rigidbody2D>();
+        RespawnManager.Instance.OnCheckpointLoaded += OnCheckpointLoaded;
     }
 
     // Update is called once per frame
@@ -68,5 +69,17 @@ public class PlayerController : MonoBehaviour
             float jumpForce = Mathf.Sqrt(-2.0f * Physics2D.gravity.y * rig.gravityScale * JumpHeight);
             rig.velocity += new Vector2(0f, jumpForce);
         }
+    }
+
+    // Respawning
+    private void OnDestroy()
+    {
+        RespawnManager.Instance.OnCheckpointLoaded -= OnCheckpointLoaded;
+    }
+
+    private void OnCheckpointLoaded(Checkpoint loadedCheckpoint)
+    {
+        rig.velocity = Vector2.zero;
+        transform.position = loadedCheckpoint.transform.position;
     }
 }
