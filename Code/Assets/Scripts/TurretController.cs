@@ -41,8 +41,6 @@ public class TurretController : MonoBehaviour
 
             // Raycastto Character 
             RaycastHit2D rayInfo = Physics2D.Raycast(transform.position, dir, VisionRange);
-
-
             // determine if in alarmed/firing state or resting state 
             if (rayInfo)
             {
@@ -55,24 +53,26 @@ public class TurretController : MonoBehaviour
         }
 
         //Shooting Player
-
         if (Detected)
         {
             RaycastHit2D rayInfo2 = Physics2D.Raycast(transform.position, transform.up);
-            if (rayInfo2.collider.gameObject.tag == "Player") {
-                Debug.Log($"I'm dead lol");
-            }
-
-            else
+            if(rayInfo2)
             {
-               // Debug.Log($"I'm not dead");
-            }
+                if (rayInfo2.collider.gameObject.tag == "Player")
+                {
+                    Debug.Log($"I'm dead lol");
+                }
 
-            var bullet = Instantiate(Projectile, Agent.position, Agent.rotation) as Bullet;
-            bullet.Start = transform.position;
-            bullet.End = rayInfo2.point;
+                else
+                {
+                    // Debug.Log($"I'm not dead");
+                }
+
+                var bullet = Instantiate(Projectile, Agent.position, Agent.rotation) as Bullet;
+                bullet.Start = transform.position;
+                bullet.End = rayInfo2.point;
+            }
         }
-            
 
         DrawDebugLines();
     }
