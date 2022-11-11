@@ -50,16 +50,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BottomOrigin: -0.26
-    - _BottomSpread: 0.29
+    - _BottomOrigin: -0.32
+    - _BottomSpread: 0.13
     - _EnableExternalAlpha: 0
     - _TopOrigin: -0.06
     - _TopSpread: 0.39
     m_Colors:
-    - _BottomColor: {r: 0.8490566, g: 0.8217794, b: 0.59674263, a: 0}
+    - _BottomColor: {r: 0.111395456, g: 0.07386969, b: 0.18867922, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
-    - _MiddleColor: {r: 0.6320754, g: 0.3814989, b: 0.25342646, a: 0}
+    - _MiddleColor: {r: 0.035436668, g: 0.032217845, b: 0.03773582, a: 0}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
-    - _TopColor: {r: 0.6981132, g: 0.5235849, b: 0.65734446, a: 0}
+    - _TopColor: {r: 0.097187616, g: 0.17069316, b: 0.2264151, a: 0}
   m_BuildTextureStacks: []
