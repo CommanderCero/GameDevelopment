@@ -41,3 +41,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Far2
+    uniqueID: 2212439049
+    locked: 0
+  - name: Mid1
+    uniqueID: 3747763739
+    locked: 0
+  - name: Near0
+    uniqueID: 51124693
+    locked: 0
+  - name: Player
+    uniqueID: 2980116633
+    locked: 0
