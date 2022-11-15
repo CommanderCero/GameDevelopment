@@ -1,92 +1,134 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.WSA;
 
 public class TurretController : MonoBehaviour
 {
     public Transform Target;
     public Bullet Projectile;
-    public Transform Agent; // turrret
     public float projectileSpeed;
 
-
-    public float TurnRate = 0.5f;
+    [Header("Vision")]
     public float VisionRadiusDegrees = 45;
     public float VisionRange = 10f;
-    bool Detected = false; 
+    public Light2D LightCone;
+
+    [Header("Patrol")]
+    public float angleStart = 45;
+    public float angleEnd = 130;
+    public float durationSeconds = 5;
+    public float startTime;
+
+    [Header("Attack")]
+    public float TurnRate = 0.1f;
+    public float WarningTime = 0.5f;
+    public Color WarningColor;
+    public Color AttackColor;
 
 
-
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
+        startTime = Time.time;
+        StartCoroutine(nameof(PatrolCoroutine));
+    }
 
-        // Stuff for raycasting (later)
-        Vector2 targetPos = Target.position;
-  
+    IEnumerator PatrolCoroutine()
+    {
+        float deltaAngle = Mathf.Abs(angleEnd - angleStart) / durationSeconds;
+        while(!CanSeeTarget())
+        {
+            float delta = Time.time - startTime;
+            // Limit value between 0 - 2 * durationSeconds
+            float tripTime = Mathf.Repeat(delta, durationSeconds * 2.0f);
 
-        // Rotate the turret such that it's UP-Vector points to the target
-        transform.up = Vector2.Lerp(transform.up, Target.position - transform.position, TurnRate * Time.deltaTime);
+            float t;
+            if(tripTime < durationSeconds)
+            {
+                // tripTime is between 0 and durationSeconds
+                t = (tripTime / durationSeconds);
+            }
+            else
+            {
+                // tripTime is between durationSeconds and 2 * durationSeconds
+                t = 2.0f - (tripTime / durationSeconds);
+            }
+            float newAngle = Mathf.SmoothStep(angleStart, angleEnd, t);
+            float angleStepSize = Mathf.Abs(newAngle - transform.rotation.eulerAngles.z);
+            float angleStepDir = Mathf.Sign(newAngle - transform.rotation.eulerAngles.z);
+            transform.rotation *= Quaternion.Euler(0, 0, angleStepDir * Mathf.Min(deltaAngle * Time.deltaTime, angleStepSize));
 
-        // Check if the target is inside the cone
+            yield return null;
+        }
+
+        StartCoroutine(nameof(AttackCoroutine));
+    }
+
+    IEnumerator AttackCoroutine()
+    {
+        LightCone.color = WarningColor;
+        float timePassed = 0;
+        while(timePassed <= WarningTime)
+        {
+            transform.up = Vector2.Lerp(transform.up, Target.position - transform.position, TurnRate * Time.deltaTime);
+            yield return null;
+            if(!CanSeeTarget())
+            {
+                LightCone.color = Color.white;
+                StartCoroutine(nameof(PatrolCoroutine));
+                yield break;
+            }
+            timePassed += Time.deltaTime;
+        }
+
+        LightCone.color = AttackColor;
+        while(CanSeeTarget())
+        {
+            transform.up = Vector2.Lerp(transform.up, Target.position - transform.position, TurnRate * Time.deltaTime);
+            Shoot();
+            yield return null;
+        }
+        LightCone.color = Color.white;
+
+        StartCoroutine(nameof(PatrolCoroutine));
+    }
+
+    public bool CanSeeTarget()
+    {
         Vector2 dir = Target.position - transform.position;
         var angle = Mathf.Abs(Vector2.Angle(dir, transform.up));
-        Detected = false;
         if (angle <= VisionRadiusDegrees / 2 && dir.magnitude <= VisionRange)
         {
-
-            // The target is inside the cone!
-            Debug.Log($"Inside the cone {angle}");
-
-            // Raycastto Character 
+            // Target is inside the cone, check if we can see it using a raycast
             RaycastHit2D rayInfo = Physics2D.Raycast(transform.position, dir, VisionRange);
-            // determine if in alarmed/firing state or resting state 
             if (rayInfo)
             {
-                if (rayInfo.collider.gameObject.tag == "Player")
+                if (rayInfo.collider.gameObject == Target.gameObject)
                 {
-                    Detected = true;
+                    return true;
                 }
             }
-
         }
+        return false;
+    }
 
-        //Shooting Player
-        if (Detected)
-        {
-            RaycastHit2D rayInfo2 = Physics2D.Raycast(transform.position, transform.up);
-            if(rayInfo2)
-            {
-                if (rayInfo2.collider.gameObject.tag == "Player")
-                {
-                    Debug.Log($"I'm dead lol");
-                }
-
-                else
-                {
-                    // Debug.Log($"I'm not dead");
-                }
-
-                var bullet = Instantiate(Projectile, Agent.position, Agent.rotation) as Bullet;
-                bullet.Start = transform.position;
-                bullet.End = rayInfo2.point;
-            }
-        }
-
-        DrawDebugLines();
+    public void Shoot()
+    {
+        RaycastHit2D rayInfo = Physics2D.Raycast(transform.position, transform.up);
+        var bullet = Instantiate(Projectile, transform.position, Quaternion.identity);
+        bullet.Start = transform.position;
+        bullet.End = rayInfo.point;
     }
 
     private void DrawDebugLines()
     {
-        var color = Detected ? Color.red : Color.green;
-
         Vector3 leftArcEnd = Quaternion.Euler(0, 0, VisionRadiusDegrees / 2f) * transform.up;
         Vector3 rightArcEnd = Quaternion.Euler(0, 0, -VisionRadiusDegrees / 2f) * transform.up;
 
         // Draw the outside of the arc + Our forward vector
         Debug.DrawLine(transform.position, transform.position + transform.up, Color.red);
-        Debug.DrawLine(transform.position, transform.position + leftArcEnd * VisionRange, color);
-        Debug.DrawLine(transform.position, transform.position + rightArcEnd * VisionRange, color);
+        Debug.DrawLine(transform.position, transform.position + leftArcEnd * VisionRange, Color.green);
+        Debug.DrawLine(transform.position, transform.position + rightArcEnd * VisionRange, Color.green);
     }
 }
