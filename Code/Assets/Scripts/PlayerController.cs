@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public bool IsGrounded { get; private set; }
+    public bool prevIsGrounded { get; private set; }
     public bool IsDashing { get; private set; }
 
     [Header("Movement")]
@@ -29,30 +31,53 @@ public class PlayerController : MonoBehaviour
     public float DashCoyoteTime = 0.15f;
     public float DashCooldown = 3f;
 
+    //Sounds 
+    [Header("Sound")]
+    public float DashVol; // volume for sound effects                
+    public AudioClip DashSound; // get audioclip 
+    public float JumpVol;
+    public AudioClip JumpSound; // get audioclip 
+    public float LandVol;
+    public AudioClip LandSound; // get audioclip 
+    public float FootVol;
+    //private AudioSource sounds = GameObject.GetComponents<AudioSource>();
+
+
     private Rigidbody2D rig;
     // Cache results from Update for use in FixedUpdate
     private float horizontalInput = 0;
     private float jumpTimer = -1;
     private float dashTimer = -1;
     private bool canDash = true;
+    
+    private AudioSource source;
+   
+
 
     void Start()
     {
         rig = GetComponent<Rigidbody2D>();
         rig.gravityScale = GravityScale;
         RespawnManager.Instance.OnCheckpointLoaded += OnCheckpointLoaded;
+
+        source = GetComponent<AudioSource>();
     }
 
     void Update()
     {
+        // get sound
+        
+
         if (IsDashing)
         {
             return;
         }
 
         // Check if we are grounded
+
+        prevIsGrounded = IsGrounded;//store previous grounded var
         IsGrounded = false;
-        if(Mathf.Abs(rig.velocity.y) <= 0.01f)
+        if (Mathf.Abs(rig.velocity.y) <= 0.01f)
         {
             foreach (var collider in Physics2D.OverlapBoxAll(GroundOffset + (Vector2)transform.position, GroundCheckSize, GroundLayers))
             {
@@ -64,10 +89,26 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        if (IsGrounded == true && prevIsGrounded == false)
+        {
+            source.PlayOneShot(LandSound, LandVol);
+        }
+
+      
+
         // Collect inputs
         horizontalInput = Input.GetAxis("Horizontal");
+
+        // Check if we are walking
+        bool walking = Convert.ToBoolean(Mathf.Abs(horizontalInput));
         
-        jumpTimer -= Time.deltaTime;
+        //while (walking && IsGrounded)
+        //{
+            //FootSound.Play();
+            //FootSound.loop = true;
+        //}
+
+    jumpTimer -= Time.deltaTime;
         if (Input.GetButtonDown("Jump"))
         {
             jumpTimer = JumpCacheTime;
@@ -112,6 +153,7 @@ public class PlayerController : MonoBehaviour
     {
         if (IsGrounded && jumpTimer >= 0)
         {
+            source.PlayOneShot(JumpSound, JumpVol);
             float jumpForce = Mathf.Sqrt(MaxJumpHeight * Physics.gravity.y * rig.gravityScale * -2f);
             rig.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
 
@@ -122,10 +164,14 @@ public class PlayerController : MonoBehaviour
 
     private void TryDash()
     {
+
+        
         if (canDash && dashTimer >= 0 && Mathf.Abs(horizontalInput) >= 0.01f)
         {
+            source.PlayOneShot(DashSound, DashVol); 
             dashTimer = 0;
             IsDashing = true;
+
             canDash = false;
             StartCoroutine(nameof(DashCoroutine), Vector2.right * horizontalInput);
         }
