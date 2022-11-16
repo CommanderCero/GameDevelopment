@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
     public float GravityScale = 3f;
     public float MaxJumpHeight = 5f;
     public float JumpCacheTime = 0.15f;
+    public float CoyoteTime = 0.15f;
 
     [Header("Ground Check")]
     public Vector2 GroundOffset;
@@ -46,6 +47,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rig;
     // Cache results from Update for use in FixedUpdate
     private float horizontalInput = 0;
+    private float groundTimer = -1;
     private float jumpTimer = -1;
     private float dashTimer = -1;
     private bool canDash = true;
@@ -65,17 +67,14 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // get sound
-        
-
         if (IsDashing)
         {
             return;
         }
 
         // Check if we are grounded
-
-        prevIsGrounded = IsGrounded;//store previous grounded var
+        groundTimer -= Time.deltaTime;
+        prevIsGrounded = IsGrounded; //store previous grounded var
         IsGrounded = false;
         if (Mathf.Abs(rig.velocity.y) <= 0.01f)
         {
@@ -84,6 +83,7 @@ public class PlayerController : MonoBehaviour
                 if (collider.gameObject != gameObject)
                 {
                     IsGrounded = true;
+                    groundTimer = CoyoteTime;
                     break;
                 }
             }
@@ -92,23 +92,13 @@ public class PlayerController : MonoBehaviour
         if (IsGrounded == true && prevIsGrounded == false)
         {
             source.PlayOneShot(LandSound, LandVol);
+            Debug.Log("Landing");
         }
-
-      
 
         // Collect inputs
         horizontalInput = Input.GetAxis("Horizontal");
 
-        // Check if we are walking
-        bool walking = Convert.ToBoolean(Mathf.Abs(horizontalInput));
-        
-        //while (walking && IsGrounded)
-        //{
-            //FootSound.Play();
-            //FootSound.loop = true;
-        //}
-
-    jumpTimer -= Time.deltaTime;
+        jumpTimer -= Time.deltaTime;
         if (Input.GetButtonDown("Jump"))
         {
             jumpTimer = JumpCacheTime;
@@ -151,7 +141,7 @@ public class PlayerController : MonoBehaviour
 
     private void TryJump()
     {
-        if (IsGrounded && jumpTimer >= 0)
+        if (groundTimer > 0 && jumpTimer > 0)
         {
             source.PlayOneShot(JumpSound, JumpVol);
             float jumpForce = Mathf.Sqrt(MaxJumpHeight * Physics.gravity.y * rig.gravityScale * -2f);
@@ -164,8 +154,6 @@ public class PlayerController : MonoBehaviour
 
     private void TryDash()
     {
-
-        
         if (canDash && dashTimer >= 0 && Mathf.Abs(horizontalInput) >= 0.01f)
         {
             source.PlayOneShot(DashSound, DashVol); 
@@ -191,14 +179,12 @@ public class PlayerController : MonoBehaviour
         }
 
         // Deactivate dash
-        Debug.Log("Dash end");
         rig.gravityScale = GravityScale;
         IsDashing = false;
 
         // Wait for cooldown
         yield return new WaitForSeconds(DashCooldown);
         canDash = true;
-        Debug.Log("Can Dash again");
     }
 
     private void ApplyGroundFriction()
