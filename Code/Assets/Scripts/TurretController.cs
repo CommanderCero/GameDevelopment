@@ -6,7 +6,7 @@ using UnityEngine.WSA;
 
 public class TurretController : MonoBehaviour
 {
-    public Transform Target;
+    public PlayerHealth Target;
     public Bullet Projectile;
     public float projectileSpeed;
 
@@ -23,10 +23,10 @@ public class TurretController : MonoBehaviour
 
     [Header("Attack")]
     public float TurnRate = 0.1f;
+    public float ShootDelay = 0.05f;
     public float WarningTime = 0.5f;
     public Color WarningColor;
     public Color AttackColor;
-
 
     private void Start()
     {
@@ -71,7 +71,7 @@ public class TurretController : MonoBehaviour
         float timePassed = 0;
         while(timePassed <= WarningTime)
         {
-            transform.up = Vector2.Lerp(transform.up, Target.position - transform.position, TurnRate * Time.deltaTime);
+            transform.up = Vector2.Lerp(transform.up, Target.transform.position - transform.position, TurnRate * Time.deltaTime);
             yield return null;
             if(!CanSeeTarget())
             {
@@ -83,10 +83,18 @@ public class TurretController : MonoBehaviour
         }
 
         LightCone.color = AttackColor;
+        float shootTimer = ShootDelay;
         while(CanSeeTarget())
         {
-            transform.up = Vector2.Lerp(transform.up, Target.position - transform.position, TurnRate * Time.deltaTime);
-            Shoot();
+            transform.up = Vector2.Lerp(transform.up, Target.transform.position - transform.position, TurnRate * Time.deltaTime);
+
+            shootTimer -= Time.deltaTime;
+            if (shootTimer <= 0)
+            {
+                Shoot();
+                shootTimer = ShootDelay;
+            }
+            
             yield return null;
         }
         LightCone.color = Color.white;
@@ -96,7 +104,7 @@ public class TurretController : MonoBehaviour
 
     public bool CanSeeTarget()
     {
-        Vector2 dir = Target.position - transform.position;
+        Vector2 dir = Target.transform.position - transform.position;
         var angle = Mathf.Abs(Vector2.Angle(dir, transform.up));
         if (angle <= VisionRadiusDegrees / 2 && dir.magnitude <= VisionRange)
         {
@@ -116,9 +124,17 @@ public class TurretController : MonoBehaviour
     public void Shoot()
     {
         RaycastHit2D rayInfo = Physics2D.Raycast(transform.position, transform.up);
-        var bullet = Instantiate(Projectile, transform.position, Quaternion.identity);
-        bullet.Start = transform.position;
-        bullet.End = rayInfo.point;
+        if(rayInfo)
+        {
+            if (rayInfo.collider.gameObject == Target.gameObject)
+            {
+                Target.Damage();
+            }
+
+            var bullet = Instantiate(Projectile, transform.position, Quaternion.identity);
+            bullet.Start = transform.position;
+            bullet.End = rayInfo.point;
+        }
     }
 
     private void DrawDebugLines()
