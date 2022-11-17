@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.WSA;
 using static Unity.VisualScripting.Member;
 
@@ -21,6 +24,11 @@ public class TurretController : MonoBehaviour
     public float angleEnd = 130;
     public float durationSeconds = 5;
     public float startTime;
+    public bool OnOff;
+    public float DelayOn; // frequency for OnOFF switches
+    public float DelayOff; // delayed time for OnOff switches
+    public float Offset; // offset the turrets
+
 
     [Header("Attack")]
     public float TurnRate = 0.1f;
@@ -28,23 +36,78 @@ public class TurretController : MonoBehaviour
     public float WarningTime = 0.5f;
     public Color WarningColor;
     public Color AttackColor;
+    //public Color SafeColor;
 
     [Header("Sound")]
     public AudioClip ShotSound;
     public float ShotVol;
     public AudioClip AlarmClip;
     public float AlarmVol;
+    public AudioClip PowerOn;
+    public float PowerOnVol;
+    public AudioClip PowerOff;
+    public float PowerOffVol; 
+
+
+    private bool PatrolOn = true;
+    private float StartNow = 0.0f;
+    private float stopWhen; 
 
     private void Start()
     {
         startTime = Time.time;
         StartCoroutine(nameof(PatrolCoroutine));
+        stopWhen = Offset + DelayOff; // when our first stop is
+
     }
 
+    private void Update()
+    {
+        //Debug.Log(Time.time);
+        if(OnOff && Time.time>1)
+        {       
+                float stopNow = Mathf.Round(Time.time%stopWhen);
+                if (stopNow == 0 && PatrolOn)
+                {
+
+                StopCoroutine(nameof(PatrolCoroutine));
+                //StopCoroutine(nameof(AttackCoroutine));
+                Debug.Log("Stopped");
+                StartNow = Time.time + DelayOff;
+                Debug.Log($"Time is ");
+                Debug.Log(StartNow);
+                LightCone.color = Color.green;
+                AudioManager.Instance.PlayOneShot(PowerOff, PowerOffVol);
+                PatrolOn = false;
+                }
+            else
+            {
+                //Debug.Log("ElseWorks");
+                float startNow = Mathf.Round(Time.time%StartNow);
+                //Debug.Log(startNow);
+                //Debug.Log(startTime);
+                //Debug.Log(PatrolOn);
+
+                if (startNow == 0 && PatrolOn == false)
+                {
+                    StartCoroutine(nameof(PatrolCoroutine));
+                    LightCone.color = Color.white;
+                    AudioManager.Instance.PlayOneShot(PowerOn, PowerOnVol);
+                    //StartCoroutine(nameof(AttackCoroutine));
+                    stopWhen = DelayOn + Time.time;
+                    Debug.Log("Started");
+                }
+            }   
+            
+               
+        }
+    }
     IEnumerator PatrolCoroutine()
     {
+        PatrolOn = true; 
         float deltaAngle = Mathf.Abs(angleEnd - angleStart) / durationSeconds;
         while(!CanSeeTarget())
+            
         {
             float delta = Time.time - startTime;
             // Limit value between 0 - 2 * durationSeconds
@@ -74,6 +137,7 @@ public class TurretController : MonoBehaviour
 
     IEnumerator AttackCoroutine()
     {
+        //AttackOn = true; 
         LightCone.color = WarningColor;
         AudioManager.Instance.PlayOneShot(AlarmClip, AlarmVol);
         float timePassed = 0;
