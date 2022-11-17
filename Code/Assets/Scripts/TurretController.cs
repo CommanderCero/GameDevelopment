@@ -44,7 +44,6 @@ public class TurretController : MonoBehaviour
     IEnumerator PatrolCoroutine()
     {
         float deltaAngle = Mathf.Abs(angleEnd - angleStart) / durationSeconds;
-        AudioManager.Instance.PlayOneShot(AlarmClip, AlarmVol);
         while(!CanSeeTarget())
         {
             float delta = Time.time - startTime;
@@ -76,6 +75,7 @@ public class TurretController : MonoBehaviour
     IEnumerator AttackCoroutine()
     {
         LightCone.color = WarningColor;
+        AudioManager.Instance.PlayOneShot(AlarmClip, AlarmVol);
         float timePassed = 0;
         while(timePassed <= WarningTime)
         {
