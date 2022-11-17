@@ -10,6 +10,11 @@ public class PlayerHealth : MonoBehaviour
 
     private float recoverTimer = 0;
 
+    private void Start()
+    {
+        RespawnManager.Instance.OnCheckpointLoaded += Instance_OnCheckpointLoaded;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -33,5 +38,10 @@ public class PlayerHealth : MonoBehaviour
         {
             LevelManager.Instance.KillPlayer();
         }
+    }
+
+    private void Instance_OnCheckpointLoaded(Checkpoint loadedCheckpoint)
+    {
+        HealthPoints = MaxHealthPoints;
     }
 }

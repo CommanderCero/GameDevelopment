@@ -31,14 +31,12 @@ public class TurretController : MonoBehaviour
 
     [Header("Sound")]
     public AudioClip ShotSound;
-    public float ShotVol; 
-    private AudioSource source; 
+    public float ShotVol;
 
     private void Start()
     {
         startTime = Time.time;
         StartCoroutine(nameof(PatrolCoroutine));
-        source = GetComponent<AudioSource>();
     }
 
     IEnumerator PatrolCoroutine()
@@ -98,7 +96,7 @@ public class TurretController : MonoBehaviour
             shootTimer -= Time.deltaTime;
             if (shootTimer <= 0)
             {
-                source.PlayOneShot(ShotSound, ShotVol);
+                AudioManager.Instance.PlayOneShot(ShotSound, ShotVol);
                 Shoot();
                 shootTimer = ShootDelay;
             }
