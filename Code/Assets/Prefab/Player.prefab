@@ -9,13 +9,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8696489166036221534}
+  - component: {fileID: 1085270673}
   - component: {fileID: 8696489166036221538}
   - component: {fileID: 6782791734281183796}
   - component: {fileID: 8696489166036221537}
   - component: {fileID: 8696489166036221536}
   - component: {fileID: 8592557672983329061}
   - component: {fileID: 1085270672}
-  - component: {fileID: 1085270673}
   - component: {fileID: 5130814619422823914}
   m_Layer: 0
   m_Name: Player
@@ -39,6 +39,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1085270673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8696489166036221541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77f3f0f48b1f3af49982e57d8edb6a22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DashTrailRenderer: {fileID: 1085270672}
 --- !u!114 &8696489166036221538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286,19 +299,6 @@ TrailRenderer:
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
   m_Emitting: 0
---- !u!114 &1085270673
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8696489166036221541}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77f3f0f48b1f3af49982e57d8edb6a22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DashTrailRenderer: {fileID: 1085270672}
 --- !u!82 &5130814619422823914
 AudioSource:
   m_ObjectHideFlags: 0
