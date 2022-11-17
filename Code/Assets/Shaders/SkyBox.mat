@@ -50,10 +50,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BottomOrigin: -0.38
-    - _BottomSpread: 0.12
+    - _BottomOrigin: -0.32
+    - _BottomSpread: 0.64
     - _EnableExternalAlpha: 0
-    - _TopOrigin: -0.06
+    - _TopOrigin: 0
     - _TopSpread: 0.39
     m_Colors:
     - _BottomColor: {r: 0.089088656, g: 0.099832684, b: 0.20754719, a: 0}
