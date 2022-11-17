@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public bool IsGrounded { get; private set; }
     public bool prevIsGrounded { get; private set; }
     public bool IsDashing { get; private set; }
+    public float DashCooldownTimer { get; private set; }
 
     [Header("Movement")]
     public float RunMaxSpeed = 10f;
@@ -41,8 +42,6 @@ public class PlayerController : MonoBehaviour
     public float LandVol;
     public AudioClip LandSound; // get audioclip 
     public float FootVol;
-    //private AudioSource sounds = GameObject.GetComponents<AudioSource>();
-
 
     private Rigidbody2D rig;
     // Cache results from Update for use in FixedUpdate
@@ -51,18 +50,12 @@ public class PlayerController : MonoBehaviour
     private float jumpTimer = -1;
     private float dashTimer = -1;
     private bool canDash = true;
-    
-    private AudioSource source;
-   
-
 
     void Start()
     {
         rig = GetComponent<Rigidbody2D>();
         rig.gravityScale = GravityScale;
         RespawnManager.Instance.OnCheckpointLoaded += OnCheckpointLoaded;
-
-        source = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -91,7 +84,7 @@ public class PlayerController : MonoBehaviour
 
         if (IsGrounded == true && prevIsGrounded == false)
         {
-            source.PlayOneShot(LandSound, LandVol);
+            AudioManager.Instance.PlayOneShot(LandSound, LandVol);
             Debug.Log("Landing");
         }
 
@@ -143,7 +136,7 @@ public class PlayerController : MonoBehaviour
     {
         if (groundTimer > 0 && jumpTimer > 0)
         {
-            source.PlayOneShot(JumpSound, JumpVol);
+            AudioManager.Instance.PlayOneShot(JumpSound, JumpVol);
             float jumpForce = Mathf.Sqrt(MaxJumpHeight * Physics.gravity.y * rig.gravityScale * -2f);
             rig.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
 
@@ -156,11 +149,12 @@ public class PlayerController : MonoBehaviour
     {
         if (canDash && dashTimer >= 0 && Mathf.Abs(horizontalInput) >= 0.01f)
         {
-            source.PlayOneShot(DashSound, DashVol); 
+            AudioManager.Instance.PlayOneShot(DashSound, DashVol);
             dashTimer = 0;
             IsDashing = true;
 
             canDash = false;
+            DashCooldownTimer = DashCooldown;
             StartCoroutine(nameof(DashCoroutine), Vector2.right * horizontalInput);
         }
     }
@@ -182,8 +176,18 @@ public class PlayerController : MonoBehaviour
         rig.gravityScale = GravityScale;
         IsDashing = false;
 
+        // Wait until we hit the ground
+        while(!IsGrounded)
+        {
+            yield return null;
+        }
+
         // Wait for cooldown
-        yield return new WaitForSeconds(DashCooldown);
+        while(DashCooldownTimer > 0)
+        {
+            DashCooldownTimer -= Time.deltaTime;
+            yield return null;
+        }
         canDash = true;
     }
 
@@ -212,6 +216,11 @@ public class PlayerController : MonoBehaviour
 
     private void OnCheckpointLoaded(Checkpoint loadedCheckpoint)
     {
+        IsDashing = false;
+        canDash = true;
+        DashCooldownTimer = 0;
+        rig.gravityScale = GravityScale;
+
         rig.velocity = Vector2.zero;
         transform.position = loadedCheckpoint.transform.position;
     }

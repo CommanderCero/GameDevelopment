@@ -38,9 +38,6 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Default
-    uniqueID: 0
-    locked: 0
   - name: Far2
     uniqueID: 2212439049
     locked: 0
@@ -52,4 +49,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 2980116633
+    locked: 0
+  - name: Default
+    uniqueID: 0
     locked: 0
