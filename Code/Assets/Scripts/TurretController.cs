@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.WSA;
+using static Unity.VisualScripting.Member;
 
 public class TurretController : MonoBehaviour
 {
@@ -28,10 +29,16 @@ public class TurretController : MonoBehaviour
     public Color WarningColor;
     public Color AttackColor;
 
+    [Header("Sound")]
+    public AudioClip ShotSound;
+    public float ShotVol; 
+    private AudioSource source; 
+
     private void Start()
     {
         startTime = Time.time;
         StartCoroutine(nameof(PatrolCoroutine));
+        source = GetComponent<AudioSource>();
     }
 
     IEnumerator PatrolCoroutine()
@@ -91,6 +98,7 @@ public class TurretController : MonoBehaviour
             shootTimer -= Time.deltaTime;
             if (shootTimer <= 0)
             {
+                source.PlayOneShot(ShotSound, ShotVol);
                 Shoot();
                 shootTimer = ShootDelay;
             }
