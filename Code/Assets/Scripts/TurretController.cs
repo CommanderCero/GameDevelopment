@@ -31,8 +31,11 @@ public class TurretController : MonoBehaviour
 
     [Header("Sound")]
     public AudioClip ShotSound;
-    public float ShotVol; 
+    public float ShotVol;
+    public AudioClip AlarmWarningClip;
+    public float AlarmWarningVol;
     private AudioSource source; 
+
 
     private void Start()
     {
@@ -75,6 +78,7 @@ public class TurretController : MonoBehaviour
     IEnumerator AttackCoroutine()
     {
         LightCone.color = WarningColor;
+        source.PlayOneShot(AlarmWarningClip, AlarmWarningVol);
         float timePassed = 0;
         while(timePassed <= WarningTime)
         {
