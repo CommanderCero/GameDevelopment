@@ -32,6 +32,8 @@ public class TurretController : MonoBehaviour
     [Header("Sound")]
     public AudioClip ShotSound;
     public float ShotVol;
+    public AudioClip AlarmClip;
+    public float AlarmVol;
 
     private void Start()
     {
@@ -42,6 +44,7 @@ public class TurretController : MonoBehaviour
     IEnumerator PatrolCoroutine()
     {
         float deltaAngle = Mathf.Abs(angleEnd - angleStart) / durationSeconds;
+        AudioManager.Instance.PlayOneShot(AlarmClip, AlarmVol);
         while(!CanSeeTarget())
         {
             float delta = Time.time - startTime;
