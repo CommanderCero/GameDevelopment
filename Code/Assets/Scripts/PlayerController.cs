@@ -204,8 +204,8 @@ public class PlayerController : MonoBehaviour
     private void OnDrawGizmos()
     {
         // Display ground check area in editor
-        UnityEditor.Handles.color = IsGrounded ? Color.red : Color.blue;
-        UnityEditor.Handles.DrawWireCube((Vector2)transform.position + GroundOffset, GroundCheckSize);
+        //UnityEditor.Handles.color = IsGrounded ? Color.red : Color.blue;
+        //UnityEditor.Handles.DrawWireCube((Vector2)transform.position + GroundOffset, GroundCheckSize);
     }
 
     // Respawning
