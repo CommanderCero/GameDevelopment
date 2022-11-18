@@ -98,7 +98,7 @@ public class PlayerController : MonoBehaviour
         }
 
         dashTimer -= Time.deltaTime;
-        if(Input.GetKeyDown(KeyCode.LeftShift))
+        if(Input.GetKeyDown(KeyCode.LeftControl))
         {
             dashTimer = DashCoyoteTime;
         }
