@@ -77,7 +77,7 @@ public class TurretController : MonoBehaviour
                 Debug.Log($"Time is ");
                 Debug.Log(StartNow);
                 LightCone.color = Color.green;
-                AudioManager.Instance.PlayOneShot(PowerOff, PowerOffVol);
+                //AudioManager.Instance.PlayOneShot(PowerOff, PowerOffVol);
                 PatrolOn = false;
                 }
             else
@@ -92,7 +92,7 @@ public class TurretController : MonoBehaviour
                 {
                     StartCoroutine(nameof(PatrolCoroutine));
                     LightCone.color = Color.white;
-                    AudioManager.Instance.PlayOneShot(PowerOn, PowerOnVol);
+                    //AudioManager.Instance.PlayOneShot(PowerOn, PowerOnVol);
                     //StartCoroutine(nameof(AttackCoroutine));
                     stopWhen = DelayOn + Time.time;
                     Debug.Log("Started");
